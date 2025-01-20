@@ -262,12 +262,11 @@ def victory_screen():
     text_coord += intro_rect.height
     screen.blit(string_rendered, intro_rect)
 
-    text_coord += 50
+    text_coord += 65
 
     string_rendered = font.render('Для того, чтобы перезапустить игру, нажмите пробел.', 1,
                                   pygame.Color('black'))
     intro_rect = string_rendered.get_rect()
-    text_coord += 15
     intro_rect.top = text_coord
     intro_rect.x = 180
     text_coord += intro_rect.height
@@ -287,6 +286,16 @@ def victory_screen():
     intro_rect = string_rendered.get_rect()
     intro_rect.top = text_coord_2
     intro_rect.x = 523
+    text_coord_2 += intro_rect.height
+    screen.blit(string_rendered, intro_rect)
+
+    text_coord_2 += 75
+
+    string_rendered = font.render(f'Поздравляю, Вы лучше чем {percent}% пользователей', 1,
+                                   pygame.Color('black'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.top = text_coord_2
+    intro_rect.x = 210
     text_coord_2 += intro_rect.height
     screen.blit(string_rendered, intro_rect)
 
@@ -568,6 +577,9 @@ all_sprites.add(cr)
 # счетчик
 k = 0
 
+# процент
+percent = 0
+
 # отрисовка фона
 d[ans][0]()
 
@@ -591,16 +603,27 @@ while running:
         count_stars += cr.count_stars
 
         if ans == 'w':
-            ans = victory_screen()
-
             with open('имя пользователей.txt', 'r', encoding='utf-8') as file:
                 lst_of_file = list()
+                lst_of_count_stars = list()
 
                 sp = file.readlines()
 
                 for i in sp:
-                    i = i.strip()
-                    lst_of_file.append(i.split(' - '))
+                    i = i.strip().split(' - ')
+                    if i[0] != name_users:
+                        lst_of_file.append(i)
+                        lst_of_count_stars.append(int(i[1]))
+
+            cnt_people = 0
+            for s in lst_of_count_stars:
+                if s < count_stars:
+                    cnt_people += 1
+
+            try:
+                percent = round(cnt_people / len(lst_of_count_stars) * 100)
+            except ZeroDivisionError:
+                percent = 100.0
 
             cnt = 0
 
@@ -616,6 +639,8 @@ while running:
             with open('имя пользователей.txt', 'w', encoding='utf-8') as file2:
                 for i in lst_of_file:
                     file2.write(f'{i[0]} - {i[1]}\n')
+
+            ans = victory_screen()
 
             count_stars = 0
 
